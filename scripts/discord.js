@@ -32,4 +32,5 @@ const headers = {
 await fetch(`${DISCORD_WEBHOOK}?wait=true`, {
 	body: JSON.stringify(body),
 	headers,
+	method: "POST",
 });
