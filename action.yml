@@ -1,4 +1,9 @@
-name: mergebot
+name: withStudioCMS Mergebot
+description: Posts a celebratory message in a Discord channel of your choice for each commit
+
+branding:
+  icon: alert-circle
+  color: purple
 
 on:
   workflow_call:
