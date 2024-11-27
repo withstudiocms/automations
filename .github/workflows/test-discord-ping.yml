@@ -1,0 +1,27 @@
+name: TEST - Discord ping
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    uses: .github/workflows/send-discord-embed.yml@main
+    secrets:
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_TEST_HOOK }}
+    with:
+      CONTENT: This is a test!
+      EMBEDS: >
+        [
+          {
+            "id": 661098315,
+            "description": "Hello World!",
+            "fields": [],
+            "author": {
+              "name": "Hello World!",
+              "icon_url": "https://github.com/withstudiocms/studiocms.dev/blob/main/assets/logo-discord.png?raw=true"
+            },
+            "title": "Hello!"
+          }
+        ]
+      
+  
