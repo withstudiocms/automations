@@ -64,7 +64,7 @@ jobs:
           ACTIONS: ${{ inputs.ACTIONS }}
         with:
           script: |
-            const { WEBHOOK_URL, CONTENT, EMBEDS, COMPONENTS } = process.env
+            const { WEBHOOK_URL, CONTENT, EMBEDS, COMPONENTS, ACTIONS } = process.env
             await fetch(WEBHOOK_URL, {
               method: 'POST',
               headers: {
