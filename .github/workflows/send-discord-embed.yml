@@ -20,7 +20,7 @@ on:
       EMBEDS:
         description: >
           A JSON array of the discord embed messages
-        default: >
+          Example:
           [
             {
               "id": 661098315,
