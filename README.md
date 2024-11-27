@@ -26,29 +26,6 @@ jobs:
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_MERGEBOT }}
 ```
 
-## first-time-pr
-
-### Usage
-```yml
-name: First time PR merged Check
-
-on: 
-  pull_request:
-    types: [closed]
-
-jobs:
-  welcome:
-    if: ${{ github.repository_owner == 'withstudiocms' }}
-    uses: withstudiocms/automations/.github/workflows/first-time-pr.yml@main
-    secrets:
-      SERVICE_TOKEN: ${{ secrets.STUDIOCMS_SERVICE_TOKEN }}
-      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_MERGEBOT }}
-      DISCORD_ROLE_HONOURED: ${{ secrets.DISCORD_ROLE_HONOURED }}
-      DISCORD_ROLE_REVERED: ${{ secrets.DISCORD_ROLE_REVERED }}
-      DISCORD_ROLE_EXALTED: ${{ secrets.DISCORD_ROLE_EXALTED }}
-```
-
-
 ## Acknowledgements
 
 ### MergeBot
