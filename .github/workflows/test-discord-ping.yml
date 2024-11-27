@@ -6,8 +6,7 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/send-discord-embed.yml
-    secrets:
-      DISCORD_WEBHOOK: ${{ secrets.DISCORD_TEST_HOOK }}
     with:
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_TEST_HOOK }}
       CONTENT: This is a test
   
