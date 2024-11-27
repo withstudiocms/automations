@@ -10,6 +10,4 @@ jobs:
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_TEST_HOOK }}
     with:
       CONTENT: This is a test
-      EMBEDS: > 
-        []
   
