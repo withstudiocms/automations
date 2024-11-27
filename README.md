@@ -37,7 +37,7 @@ on:
     types: [closed]
 
 jobs:
-  mergebot:
+  welcome:
     if: ${{ github.repository_owner == 'withstudiocms' }}
     uses: withstudiocms/automations/.github/workflows/first-time-pr.yml@main
     secrets:
