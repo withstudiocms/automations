@@ -44,16 +44,20 @@ jobs:
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         with:
           script: |
-            await fetch(${{ secrets.DISCORD_WEBHOOK }}, {
+            const fetchURL = '${{ secrets.DISCORD_WEBHOOK }}';
+            const Content = '${{ inputs.CONTENT }}';
+            const Embeds = ${{ inputs.EMBEDS }};
+            
+            await fetch(fetchURL, {
               method: 'POST',
               headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                content: ${{ inputs.CONTENT }},
+                content: Content,
                 tts: false,
-                embeds: ${{ inputs.EMBEDS }}
+                embeds: Embeds,
               })
             })
       
