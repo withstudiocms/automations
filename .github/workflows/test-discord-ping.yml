@@ -7,8 +7,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: "withstudiocms/automation"
+          ref: "main"
+          path: "automation"
+          
       - name: test
-        uses: ./.github/workflows/send-discord-embed.yml
+        uses: ./automation/.github/workflows/send-discord-embed.yml
         with:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_TEST_HOOK }}
           CONTENT: This is a test
