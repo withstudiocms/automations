@@ -2,7 +2,7 @@ name: Send discord Embed
 
 on:
   workflow_call:
-    secrets:
+    inputs:
       DISCORD_WEBHOOK:
         description: >
           URL of a Discord webhook. To create one:
@@ -10,8 +10,8 @@ on:
             2. Right-click and select “Edit Channel”.
             3. Navigate to “Integrations” > “View Webhooks”.
             4. Click “New Webhook” and copy the URL for your newly created webhook.
+        type: string
         required: true
-    inputs:
       CONTENT:
         description: >
           The non-embedded Content for the discord message
@@ -47,7 +47,7 @@ jobs:
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         with:
           script: |
-            const fetchURL = '${{ secrets.DISCORD_WEBHOOK }}';
+            const fetchURL = '${{ inputs.DISCORD_WEBHOOK }}';
             const Content = '${{ inputs.CONTENT }}';
             const Embeds = ${{ inputs.EMBEDS }};
             
