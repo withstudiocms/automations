@@ -5,8 +5,11 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflows/send-discord-embed.yml
-    with:
-      DISCORD_WEBHOOK: ${{ secrets.DISCORD_TEST_HOOK }}
-      CONTENT: This is a test
+    runs-on: ubuntu-latest
+    steps:
+      - name: test
+        uses: ./.github/workflows/send-discord-embed.yml
+        with:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_TEST_HOOK }}
+          CONTENT: This is a test
   
