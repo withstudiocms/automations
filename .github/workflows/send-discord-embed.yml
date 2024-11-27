@@ -56,27 +56,20 @@ jobs:
     steps:
       - name: Send Discord Message
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
-        env:
-          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
-          CONTENT: ${{ inputs.CONTENT }}
-          EMBEDS: ${{ inputs.EMBEDS }}
-          COMPONENTS: ${{ inputs.COMPONENTS }}
-          ACTIONS: ${{ inputs.ACTIONS }}
         with:
           script: |
-            const { WEBHOOK_URL, CONTENT, EMBEDS, COMPONENTS, ACTIONS } = process.env
-            await fetch(WEBHOOK_URL, {
+            await fetch(${{ secrets.DISCORD_WEBHOOK }}, {
               method: 'POST',
               headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                content: CONTENT,
+                content: ${{ inputs.CONTENT }},
                 tts: false,
-                embeds: EMBEDS,
-                components: COMPONENTS,
-                actions: ACTIONS
+                embeds: ${{ inputs.EMBEDS }},
+                components: ${{ inputs.COMPONENTS }},
+                actions: ${{ inputs.ACTIONS }}
               })
             })
       
