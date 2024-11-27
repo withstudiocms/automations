@@ -15,6 +15,7 @@ on:
       CONTENT:
         description: >
           The non-embedded Content for the discord message
+        default: ''
         type: string
         required: false
       EMBEDS:
@@ -33,6 +34,8 @@ on:
               "title": "Hello!"
             }
           ]
+        default: >
+          []
         type: string
         required: false
 
