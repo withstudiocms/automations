@@ -35,20 +35,6 @@ on:
           ]
         type: string
         required: false
-      COMPONENTS:
-        description: >
-          A JSON array of the discord components
-        default: > 
-          []
-        type: string
-        required: false
-      ACTIONS:
-        description: >
-          A JSON object for Discord actions
-        default: > 
-          {}
-        type: string
-        required: false
 
 jobs:
   runner:
@@ -67,9 +53,7 @@ jobs:
               body: JSON.stringify({
                 content: ${{ inputs.CONTENT }},
                 tts: false,
-                embeds: ${{ inputs.EMBEDS }},
-                components: ${{ inputs.COMPONENTS }},
-                actions: ${{ inputs.ACTIONS }}
+                embeds: ${{ inputs.EMBEDS }}
               })
             })
       
