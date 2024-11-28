@@ -44,8 +44,7 @@ function getBody() {
 			};
 		}
 		return {
-			content: "",
-			embeds: DISCORD_MESSAGE_EMBEDS,
+			embeds: parseDiscordEmbeds(DISCORD_MESSAGE_EMBEDS),
 		};
 	}
 	return {
