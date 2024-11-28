@@ -1,0 +1,45 @@
+name: withStudioCMS Mergebot
+
+on:
+  workflow_call:
+    secrets:
+      DISCORD_WEBHOOK:
+        description: >
+          URL of a Discord webhook. To create one:
+            1. Find the channel you want to post a message in.
+            2. Right-click and select “Edit Channel”.
+            3. Navigate to “Integrations” > “View Webhooks”.
+            4. Click “New Webhook” and copy the URL for your newly created webhook.
+        required: true
+    inputs:
+      DISCORD_MESSAGE:
+        description: The intended basic string to be used in the discord message
+        type: string
+        required: false
+      DISCORD_MESSAGE_EMBEDS:
+        description: This should be a valid JSON string of an array of Discord embed objects.
+        type: string
+        required: false
+
+jobs:
+  post-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: "withstudiocms/automations"
+          ref: "main"
+          path: "automation"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Send message on Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_MESSAGE: ${{ inputs.DISCORD_MESSAGE }}
+          DISCORD_MESSAGE_EMBEDS: ${{ inputs.DISCORD_MESSAGE_EMBEDS }}
+        run: node automation/scripts/discord.js
