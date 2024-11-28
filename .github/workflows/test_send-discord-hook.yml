@@ -22,7 +22,7 @@ jobs:
       - name: Send message on Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_TEST_HOOK }}
-          DISCORD_MESSAGE: "Test message from GitHub Actions"
+        #   DISCORD_MESSAGE: "Test message from GitHub Actions"
           DISCORD_MESSAGE_EMBEDS: >
             [
               {
