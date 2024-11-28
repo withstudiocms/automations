@@ -16,10 +16,25 @@ if (!GITHUB_ACTION || !DISCORD_WEBHOOK) {
 	);
 }
 
-const body = {
-	content: DISCORD_MESSAGE ? DISCORD_MESSAGE : '',
-	embeds: DISCORD_MESSAGE_EMBEDS ? JSON.parse(DISCORD_MESSAGE_EMBEDS) : [],
-};
+function getBody() {
+	if (DISCORD_MESSAGE_EMBEDS) {
+		if (DISCORD_MESSAGE) {
+			return {
+				content: DISCORD_MESSAGE,
+				embeds: DISCORD_MESSAGE_EMBEDS,
+			};
+		}
+		return {
+			embeds: DISCORD_MESSAGE_EMBEDS,
+		};
+	}
+	return {
+		content: DISCORD_MESSAGE,
+	}
+}
+
+const body = getBody();
+
 if (DISCORD_USERNAME) {
 	body.username = DISCORD_USERNAME;
 }
