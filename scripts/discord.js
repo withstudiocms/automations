@@ -16,9 +16,6 @@ if (!GITHUB_ACTION || !DISCORD_WEBHOOK) {
 	);
 }
 
-console.log("DISCORD_MESSAGE", DISCORD_MESSAGE);
-console.log("DISCORD_MESSAGE_EMBEDS", DISCORD_MESSAGE_EMBEDS);
-
 function parseDiscordEmbeds(jsonString) {
     try {
         // Fix common JSON formatting issues:
@@ -53,8 +50,6 @@ function getBody() {
 }
 
 const body = getBody();
-
-console.log("MESSAGE_BODY", body);
 
 if (DISCORD_USERNAME) {
 	body.username = DISCORD_USERNAME;

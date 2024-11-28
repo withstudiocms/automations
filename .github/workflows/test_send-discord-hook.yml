@@ -22,18 +22,18 @@ jobs:
       - name: Send message on Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_TEST_HOOK }}
-        #   DISCORD_MESSAGE: "Test message from GitHub Actions"
-          DISCORD_MESSAGE_EMBEDS: >
-            [
-              {
-                "id": 661098315,
-                "description": "Just a test message from GitHub Actions.",
-                "fields": [],
-                "author": {
-                  "name": "withStudioCMS Test Bot",
-                  "icon_url": "https://github.com/withstudiocms/studiocms.dev/blob/main/assets/logo-discord.png?raw=true"
-                },
-                "title": "Hello, world!",
-              }
-            ]
+          DISCORD_MESSAGE: "Test message from GitHub Actions"
+        #   DISCORD_MESSAGE_EMBEDS: >
+        #     [
+        #       {
+        #         "id": 661098315,
+        #         "description": "Just a test message from GitHub Actions.",
+        #         "fields": [],
+        #         "author": {
+        #           "name": "withStudioCMS Test Bot",
+        #           "icon_url": "https://github.com/withstudiocms/studiocms.dev/blob/main/assets/logo-discord.png?raw=true"
+        #         },
+        #         "title": "Hello, world!",
+        #       }
+        #     ]
         run: node automation/scripts/discord.js
