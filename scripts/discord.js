@@ -38,6 +38,8 @@ function getBody() {
 
 const body = getBody();
 
+console.log("MESSAGE_BODY", body);
+
 if (DISCORD_USERNAME) {
 	body.username = DISCORD_USERNAME;
 }
