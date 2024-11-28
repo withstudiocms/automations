@@ -44,6 +44,7 @@ function getBody() {
 			};
 		}
 		return {
+			content: "",
 			embeds: DISCORD_MESSAGE_EMBEDS,
 		};
 	}
