@@ -19,13 +19,20 @@ if (!GITHUB_ACTION || !DISCORD_WEBHOOK) {
 console.log("DISCORD_MESSAGE", DISCORD_MESSAGE);
 console.log("DISCORD_MESSAGE_EMBEDS", DISCORD_MESSAGE_EMBEDS);
 
-// Convert the array of strings to an array of objects
-if (DISCORD_MESSAGE_EMBEDS) {
-	try {
-		DISCORD_MESSAGE_EMBEDS = JSON.parse(DISCORD_MESSAGE_EMBEDS);
-	} catch (error) {
-		console.error("Failed to parse DISCORD_MESSAGE_EMBEDS", error);
-	}
+function parseDiscordEmbeds(jsonString) {
+    try {
+        // Fix common JSON formatting issues:
+        const fixedJsonString = jsonString
+            .replace(/,\s*}/g, '}') // Remove trailing commas in objects
+            .replace(/,\s*]/g, ']') // Remove trailing commas in arrays
+            .replace(/\\n/g, '')    // Remove literal newline escape sequences
+            .replace(/'/g, '"');    // Replace single quotes with double quotes (for JSON)
+
+        // Parse the fixed JSON string
+        return JSON.parse(fixedJsonString);
+    } catch (error) {
+        throw new Error(`Failed to parse JSON: ${error.message}`);
+    }
 }
 
 function getBody() {
@@ -33,7 +40,7 @@ function getBody() {
 		if (DISCORD_MESSAGE) {
 			return {
 				content: DISCORD_MESSAGE,
-				embeds: DISCORD_MESSAGE_EMBEDS,
+				embeds: parseDiscordEmbeds(DISCORD_MESSAGE_EMBEDS),
 			};
 		}
 		return {
