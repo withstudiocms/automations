@@ -27,7 +27,7 @@ jobs:
             [
               {
                 "id": 661098315,
-                "description": `Just a test message from GitHub Actions.`,
+                "description": "Just a test message from GitHub Actions.",
                 "fields": [],
                 "author": {
                   "name": "withStudioCMS Test Bot",
