@@ -19,6 +19,15 @@ if (!GITHUB_ACTION || !DISCORD_WEBHOOK) {
 console.log("DISCORD_MESSAGE", DISCORD_MESSAGE);
 console.log("DISCORD_MESSAGE_EMBEDS", DISCORD_MESSAGE_EMBEDS);
 
+// Convert the array of strings to an array of objects
+if (DISCORD_MESSAGE_EMBEDS) {
+	try {
+		DISCORD_MESSAGE_EMBEDS = JSON.parse(DISCORD_MESSAGE_EMBEDS);
+	} catch (error) {
+		console.error("Failed to parse DISCORD_MESSAGE_EMBEDS", error);
+	}
+}
+
 function getBody() {
 	if (DISCORD_MESSAGE_EMBEDS) {
 		if (DISCORD_MESSAGE) {
