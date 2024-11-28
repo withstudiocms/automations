@@ -1,0 +1,39 @@
+name: withStudioCMS Test Send Discord Hook
+
+on:
+  workflow_dispatch:
+
+jobs:
+  post-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: "withstudiocms/automations"
+          ref: "main"
+          path: "automation"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Send message on Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_TEST_HOOK }}
+          DISCORD_MESSAGE: "Test message from GitHub Actions"
+          DISCORD_EMBEDS: >
+            [
+              {
+                "id": 661098315,
+                "description": `Just a test message from GitHub Actions.`,
+                "fields": [],
+                "author": {
+                  "name": "withStudioCMS Test Bot",
+                  "icon_url": "https://github.com/withstudiocms/studiocms.dev/blob/main/assets/logo-discord.png?raw=true"
+                },
+                "title": "Hello, world!",
+              }
+            ]
+        run: node automation/scripts/discord.js
