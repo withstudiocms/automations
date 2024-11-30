@@ -1,4 +1,4 @@
-name: withStudioCMS Test Send Discord Hook
+name: TEST - Send Discord Hook
 
 on:
   workflow_dispatch:
