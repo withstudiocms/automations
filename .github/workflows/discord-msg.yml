@@ -17,7 +17,20 @@ on:
         type: string
         required: false
       DISCORD_MESSAGE_EMBEDS:
-        description: This should be a valid JSON string of an array of Discord embed objects.
+        description: >
+          This should be a valid JSON string of an array of Discord embed objects. Ex:
+          [
+            {
+              "id": 661098315,
+              "title": "Hello, world!",
+              "description": "Just a example message from GitHub Actions.",
+              "fields": [],
+              "author": {
+                "name": "withStudioCMS Example",
+                "icon_url": "https://github.com/withstudiocms/studiocms.dev/blob/main/assets/logo-discord.png?raw=true"
+              },
+            }
+          ]
         type: string
         required: false
 
