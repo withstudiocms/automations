@@ -1,4 +1,4 @@
-name: withStudioCMS Mergebot
+name: withStudioCMS Send Discord Message
 
 on:
   workflow_call:
