@@ -18,7 +18,7 @@ on:
         required: false
       DISCORD_MESSAGE_EMBEDS:
         description: >
-          This should be a valid JSON string of an array of Discord embed objects. Ex:
+          This should be a valid JSON string of an array of Discord embed objects. Example:
           [
             {
               "id": 661098315,
