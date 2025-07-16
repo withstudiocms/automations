@@ -1,3 +1,7 @@
 {
-    "type": "module"
+    "name": "root",
+    "type": "module",
+    "scripts": {
+        "build-announce": "pnpm --filter announcement-generator build"
+    }
 }

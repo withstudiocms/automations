@@ -1,0 +1,15 @@
+name: 'Generate Discord Announcement'
+description: 'Generate release announcements for Discord'
+
+inputs:
+  published-packages:
+    required: true
+    description: List of changeset published-packages, (i.e. steps.changesets.outputs.publishedPackages)
+
+outputs:
+  DISCORD_MESSAGE:
+    description: 'The time we greeted you'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
