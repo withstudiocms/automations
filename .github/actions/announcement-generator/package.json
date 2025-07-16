@@ -1,6 +1,9 @@
 {
     "name": "announcement-generator",
     "type": "module",
+    "version": "1.0.0",
+    "description": "GitHub Action to generate Discord release announcements",
+    "private": true,
     "scripts": {
         "build": "rollup --config rollup.config.js"
     },

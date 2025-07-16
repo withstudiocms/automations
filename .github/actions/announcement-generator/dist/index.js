@@ -31314,7 +31314,7 @@ function pluralize(text) {
     );
 }
 
-function singularlize(text) {
+function singularize(text) {
     return text.replace(/(\[([^\]]+)\])/gm, (_, _full, match) => `${match}`);
 }
 
@@ -31344,7 +31344,12 @@ try {
     async function generateMessage() {
         await generatePackageMap();
         const releases = coreExports.getInput('published-packages');
-        const data = JSON.parse(releases);
+        let data;
+        try {
+            data = JSON.parse(releases);
+        } catch (error) {
+            throw new Error(`Invalid JSON in published-packages input: ${error.message}`);
+        }
         const packages = await Promise.all(
             data.map(({ name, version }) => {
                 const p = packageMap.get(name);
@@ -31363,11 +31368,13 @@ try {
         const descriptor = item(descriptors);
         const verb = item(verbs);
 
-        let message = '<@&1309310416362537020>\n';
+        const discordRoleId = coreExports.getInput('discord-role-id') || '1309310416362537020';
+
+        let message = `<@&${discordRoleId}>\n`;
 
         if (packages.length === 1) {
             const { name, version, url } = packages[0];
-            message += `${emoji} \`${name}@${version}\` ${singularlize(
+            message += `${emoji} \`${name}@${version}\` ${singularize(
                 verb
             )}\nRead the [release notes →](<${url}>)\n`;
         } else {

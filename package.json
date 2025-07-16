@@ -1,5 +1,6 @@
 {
     "name": "root",
+    "private": true,
     "type": "module",
     "scripts": {
         "build-announce": "pnpm --filter announcement-generator build"

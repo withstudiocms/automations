@@ -1,5 +1,3 @@
-node_modules
-# moon
-.moon/cache
-.moon/docker
 .npmrc
+
+/node_modules/

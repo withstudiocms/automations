@@ -5,10 +5,13 @@ inputs:
   published-packages:
     required: true
     description: List of changeset published-packages, (i.e. steps.changesets.outputs.publishedPackages)
+  discord-role-id:
+    required: false
+    description: Allows customizing the discord role id used in the announcements
 
 outputs:
   DISCORD_MESSAGE:
-    description: 'The time we greeted you'
+    description: 'Discord-formatted release announcement'
 
 runs:
   using: 'node20'
