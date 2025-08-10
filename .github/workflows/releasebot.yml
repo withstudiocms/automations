@@ -3,7 +3,7 @@ name: Release Bot
 on:
   workflow_call:
     secrets:
-      DISCORD_WEBHOOK_RELEASE:
+      DISCORD_WEBHOOK:
         description: >
           URL of a Discord webhook for release notifications.
           To create one, follow the same steps as for the mergebot webhook.
@@ -32,7 +32,6 @@ jobs:
   release-bot:
     runs-on: ubuntu-latest
     steps:
-      # At this point, we assume that the user has already checked out the repository, and ran the actions/install/action.yml workflow.
       - name: Install Extra Dependencies
         run: pnpm install tinyglobby
 
@@ -237,10 +236,9 @@ jobs:
             message += `\n\nAlso ${item(extraVerbs)}: ${remainingPackages.length} other packages!`;
             return message;
 
-
       - name: Send message on Discord
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@d2594079a10f1d6739ee50a2471f0ca57418b554 # 0.4.0
         with:
           args: ${{ steps.message.outputs.result }}
