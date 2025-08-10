@@ -27,24 +27,27 @@ on:
         description: >
           A JSON array of packages that were published in this release.
           Each package should have a `name` and `version` field.
-
 jobs:
   release-bot:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: "withstudiocms/automations"
+          ref: "main"
+          path: "automation"
+          persist-credentials: false
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
-
       - name: Setup Node.js based on .node-version
         uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4
         with:
           node-version-file: '.node-version'
           cache: 'pnpm'
-
       - name: Install Extra Dependencies
         run: pnpm add -Dw tinyglobby --no-save
         working-directory: ${{ inputs.CWD }}
-
       - name: Generate BaseURL
         id: base-url
         uses: actions/github-script@v7
@@ -57,12 +60,6 @@ jobs:
             const { GITHUB_REF = 'main', GITHUB_REPOSITORY } = process.env;
             const baseUrl = new URL(`https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF}/`);
             return baseUrl.toString();
-
-      - name: Get pnpm packages
-        id: pnpm-packages
-        run: |
-          echo "packages-output=$(pnpm list --recursive --depth -1 --json | jq -c 'map(select(.private == false))')" >> $GITHUB_OUTPUT
-      
       - name: Generate Package Map
         id: package-map
         uses: actions/github-script@v7
@@ -99,7 +96,6 @@ jobs:
             await generatePackageMap();
 
             return JSON.stringify(Object.fromEntries(packageMap));
-
       - name: Generate Message
         id: message
         uses: actions/github-script@v7
@@ -111,10 +107,9 @@ jobs:
           result-encoding: string
           script: |
             const baseUrl = new URL(process.env.BASE_URL);
-            const releases = JSON.parse(process.env.RELEASES)
+            const releases = JSON.parse(process.env.RELEASES || '[]');
             
-            const packageMapRaw = process.env.PACKAGE_MAP || '{}';
-            const parsedPackageMap = JSON.parse(packageMapRaw);
+            const parsedPackageMap = JSON.parse(process.env.PACKAGE_MAP);
             const packageMap = new Map(Object.entries(parsedPackageMap));
 
             const emojis = ['🎉', '🥳', '🚀', '🧑', '🎊', '🏆', '✅', '🤩', '🤖', '🙌'];
@@ -245,7 +240,6 @@ jobs:
 
             message += `\n\nAlso ${item(extraVerbs)}: ${remainingPackages.length} other packages!`;
             return message;
-
       - name: Send message on Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
