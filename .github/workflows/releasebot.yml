@@ -118,6 +118,7 @@ jobs:
             const releases = JSON.parse(process.env.RELEASES || '[]');
             const parsedPackageMap = JSON.parse(process.env.PACKAGE_MAP);
             const packageMap = new Map(Object.entries(parsedPackageMap));
+            const role = process.env.ROLE_MENTION_ID;
 
             const emojis = ['🎉', '🥳', '🚀', '🧑', '🎊', '🏆', '✅', '🤩', '🤖', '🙌'];
             const descriptors = [
@@ -211,7 +212,6 @@ jobs:
             const descriptor = item(descriptors);
             const verb = item(verbs);
 
-            const role = process.env.ROLE_MENTION_ID;
             let message = role ? `<@&${role}>\n` : '';
 
             if (packages.length === 1) {
