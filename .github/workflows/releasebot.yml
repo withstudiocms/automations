@@ -32,9 +32,6 @@ jobs:
   release-bot:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Extra Dependencies
-        run: pnpm install tinyglobby
-
       - name: Generate BaseURL
         id: base-url
         uses: actions/github-script@v7
@@ -55,41 +52,10 @@ jobs:
       
       - name: Generate Package Map
         id: package-map
-        uses: actions/github-script@v7
-        env:
-          CWD: ${{ inputs.CWD }}
+        uses: withstudiocms/automations/.github/workflows/releasebot-packagemap.yml@releasebot
         with:
-          result-encoding: string
-          script: |
-            const { glob } = require('tinyglobby');
-            const { readFile } = require('fs/promises');
-            const { fileURLToPath } = require('url');
-
-            const CWD = process.env.CWD || '.';
-            const CWD_URL = new URL(CWD, 'file://');
-
-            const packageMap = new Map();
-
-            async function generatePackageMap() {
-              const packageRoot = new URL('./packages/', CWD_URL);
-              const packages = await glob(['*/package.json', '*/*/pacakge.json'], {
-                cwd: fileURLToPath(packageRoot),
-                expandDirectories: false,
-                ignore: ['**/node_modules/**'],
-              });
-
-              await Promise.all(packages.map(async (pkg) => {
-                  const pkgFile = fileURLToPath(new URL(pkg, packageRoot));
-                  const content = await readFile(pkgFile).then((res) => JSON.parse(res.toString()));
-                  packageMap.set(content.name, `./packages/${pkg.replace('/package.json', '')}`);
-                });
-              );
-            }
-
-            await generatePackageMap();
-
-            return JSON.stringify(Object.fromEntries(packageMap));
-
+          CWD: ${{ inputs.CWD }}
+          
       - name: Generate Message
         id: message
         uses: actions/github-script@v7
