@@ -1,0 +1,247 @@
+name: Release Bot
+
+on:
+  workflow_call:
+    secrets:
+      DISCORD_WEBHOOK_RELEASE:
+        description: >
+          URL of a Discord webhook for release notifications.
+          To create one, follow the same steps as for the mergebot webhook.
+        required: true
+    inputs:
+      repository:
+        type: string
+        required: true
+        description: >
+          The repository to run the release bot on.
+          This should be the full repository name, e.g., `withstudiocms/automations`.
+      CWD:
+        type: string
+        required: true
+        description: >
+          The current working directory where the release bot should operate.
+          This is typically the root of the repository.
+      PublishedPackages:
+        type: string
+        required: true
+        description: >
+          A JSON array of packages that were published in this release.
+          Each package should have a `name` and `version` field.
+
+jobs:
+  release-bot:
+    runs-on: ubuntu-latest
+    steps:
+      # At this point, we assume that the user has already checked out the repository, and ran the actions/install/action.yml workflow.
+      - name: Install Extra Dependencies
+        run: pnpm install tinyglobby
+
+      - name: Generate BaseURL
+        id: base-url
+        uses: actions/github-script@v7
+        env:
+          GITHUB_REF: ${{ github.ref_name }}
+          GITHUB_REPOSITORY: ${{ inputs.repository }}
+        with:
+          result-encoding: string
+          script: |
+            const { GITHUB_REF = 'main', GITHUB_REPOSITORY } = process.env;
+            const baseUrl = new URL(`https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF}/`);
+            return baseUrl.toString();
+
+      - name: Get pnpm packages
+        id: pnpm-packages
+        run: |
+          echo "packages-output=$(pnpm list --recursive --depth -1 --json | jq -c 'map(select(.private == false))')" >> $GITHUB_OUTPUT
+      
+      - name: Generate Package Map
+        id: package-map
+        uses: actions/github-script@v7
+        env:
+          CWD: ${{ inputs.CWD }}
+          WORKSPACE: ${{ github.workspace }}
+        with:
+          result-encoding: string
+          script: |
+            const { glob } = require('tinyglobby');
+            const { readFile } = require('fs/promises');
+            const { fileURLToPath } = require('url');
+
+            const CWD = process.env.CWD || process.env.WORKSPACE || '.';
+            const CWD_URL = new URL(CWD, 'file://');
+
+            const packageMap = new Map();
+
+            async function generatePackageMap() {
+              const packageRoot = new URL('./packages/', CWD_URL);
+              const packages = await glob(['*/package.json', '*/*/pacakge.json'], {
+                cwd: fileURLToPath(packageRoot),
+                expandDirectories: false,
+                ignore: ['**/node_modules/**'],
+              });
+
+              await Promise.all(packages.map(async (pkg) => {
+                  const pkgFile = fileURLToPath(new URL(pkg, packageRoot));
+                  const content = await readFile(pkgFile).then((res) => JSON.parse(res.toString()));
+                  packageMap.set(content.name, `./packages/${pkg.replace('/package.json', '')}`);
+                });
+              );
+            }
+
+            await generatePackageMap();
+
+            return JSON.stringify(Object.fromEntries(packageMap));
+
+      - name: Generate Message
+        id: message
+        uses: actions/github-script@v7
+        env:
+          RELEASES: ${{ inputs.PublishedPackages }}
+          PACKAGE_MAP: ${{ steps.package-map.outputs.result }}
+          BASE_URL: ${{ steps.base-url.outputs.result }}
+        with:
+          result-encoding: string
+          script: |
+            const baseUrl = new URL(process.env.BASE_URL);
+            const releases = JSON.parse(process.env.RELEASES || '[]')
+            
+            const packageMapRaw = process.env.PACKAGE_MAP || '{}';
+            const parsedPackageMap = JSON.parse(packageMapRaw);
+            const packageMap = new Map(Object.entries(parsedPackageMap));
+
+            const emojis = ['🎉', '🥳', '🚀', '🧑', '🎊', '🏆', '✅', '🤩', '🤖', '🙌'];
+            const descriptors = [
+              'new releases',
+              'hot and fresh updates',
+              'shiny updates',
+              'exciting changes',
+              'package updates',
+              'awesome updates',
+              'bug fixes and features',
+              'updates',
+            ];
+            const verbs = [
+              'just went out!',
+              'just launched!',
+              'now available!',
+              'in the wild!',
+              'now live!',
+              'hit the registry!',
+              'to share!',
+              'for you!',
+              'for y’all! 🤠',
+              'comin’ your way!',
+              'comin’ atcha!',
+              'comin’ in hot!',
+              'freshly minted on the blockchain! (jk)',
+              '[is] out (now with 100% more reticulated splines!)',
+              '(as seen on TV!)',
+              'just dropped!',
+              '– artisanally hand-crafted just for you.',
+              '– oh happy day!',
+              '– enjoy!',
+              'now out. Be the first on your block to download!',
+              'made with love 💕',
+              '[is] out! Our best [version] yet!',
+              '[is] here. DOWNLOAD! DOWNLOAD! DOWNLOAD!',
+              '... HUZZAH!',
+              '[has] landed!',
+              'landed! The internet just got a little more fun.',
+              '– from our family to yours.',
+              '– go forth and build!',
+            ];
+            const extraVerbs = [
+              'new',
+              'here',
+              'released',
+              'freshly made',
+              'going out',
+              'hitting the registry',
+              'available',
+              'live now',
+              'hot and fresh',
+              'for you',
+              "comin' atcha",
+            ];
+
+            function item(items) {
+              return items[Math.floor(Math.random() * items.length)];
+            }
+
+            const plurals = new Map([
+              ['is', 'are'],
+              ['has', 'have'],
+            ]);
+
+            function pluralize(text) {
+              return text.replace(/(\[([^\]]+)\])/gm, (_, _full, match) =>
+                plurals.has(match) ? plurals.get(match) : `${match}s`
+              );
+            }
+
+            function singularlize(text) {
+              return text.replace(/(\[([^\]]+)\])/gm, (_, _full, match) => `${match}`);
+            }
+
+            const packages = await Promise.all(
+              parsedPackageMap.map(({ name, version }) => {
+                const p = packageMap.get(name);
+                if (!p) {
+                  throw new Error(`Unable to find entrypoint for package ${name}`);
+                }
+                return {
+                  name,
+                  version,
+                  url: new URL(`${p}/CHANGELOG.md#${version.replace(/\./g, '')}`, baseUrl.toString()),
+                }
+              })
+            )
+
+            const emoji = item(emojis);
+            const descriptor = item(descriptors);
+            const verb = item(verbs);
+
+            let message = '<@&1309310416362537020>\n';
+
+            if (packages.length === 1) {
+              const { name, version, url } = packages[0];
+              message += `${emoji} \`${name}@${version}\` ${singularlize(
+                verb
+              )}\nRead the [release notes →](<${url}>)\n`;
+            } else {
+              message += `${emoji} Some ${descriptor} ${pluralize(verb)}\n\n`;
+              for (const { name, version, url } of packages) {
+                message += `• \`${name}@${version}\` Read the [release notes →](<${url}>)\n`;
+              }
+            }
+
+            if (message.length < 2000) {
+              return message;
+            }
+            const { name, version, url } = packages.find((pkg) => pkg.name === 'astro') ?? packages[0];
+            message = `${emoji} Some ${descriptor} ${pluralize(verb)}\n\n`;
+            message += `• \`${name}@${version}\` Read the [release notes →](<${url}>)\n`;
+
+            message += `\nAlso ${item(extraVerbs)}:`;
+
+            const remainingPackages = packages.filter((p) => p.name !== name);
+            for (const { name, version, _url } of remainingPackages) {
+              message += `\n• \`${name}@${version}\``;
+            }
+
+            if (message.length < 2000) {
+              return message;
+            }
+            message = `${emoji} Some ${descriptor} ${pluralize(verb)}\n\n`;
+            message += `• \`${name}@${version}\` Read the [release notes →](<${url}>)\n`;
+
+            message += `\n\nAlso ${item(extraVerbs)}: ${remainingPackages.length} other packages!`;
+            return message;
+
+
+      - name: Send message on Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}
+        uses: Ilshidur/action-discord@d2594079a10f1d6739ee50a2471f0ca57418b554 # 0.4.0
+        with:
+          args: ${{ steps.message.outputs.result }}
