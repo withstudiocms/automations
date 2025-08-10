@@ -33,7 +33,7 @@ runs:
     # so we don't need to set it up again.
     - name: Install Extra Dependencies
       shell: bash
-      run: pnpm add -D tinyglobby --no-save
+      run: pnpm install -D tinyglobby
 
     - name: Generate BaseURL
       id: base-url
