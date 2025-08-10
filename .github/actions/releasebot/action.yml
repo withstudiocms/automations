@@ -1,7 +1,8 @@
 name: Release Bot
+author: withstudiocms
 description: >
   A GitHub Action to automate release notifications on Discord.
-author: withStudioCMS
+
 branding:
   color: 'blue'
   icon: 'package'
@@ -27,27 +28,12 @@ inputs:
 
 runs:
   using: composite
-  steps:
-    - name: Checkout Automations Repository
-      uses: actions/checkout@v4
-      with:
-        repository: "withstudiocms/automations"
-        ref: "main"
-        path: "automation"
-        persist-credentials: false
-
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-    
-    - name: Setup Node.js based on .node-version
-      uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4
-      with:
-        node-version-file: '.node-version'
-        cache: 'pnpm'
-    
+  steps:    
+    # PNPM and Node are already available in the environment,
+    # so we don't need to set it up again.
     - name: Install Extra Dependencies
       shell: bash
-      run: pnpm add -Dw tinyglobby --no-save
+      run: pnpm add -D tinyglobby --no-save
 
     - name: Generate BaseURL
       id: base-url
@@ -86,17 +72,18 @@ runs:
               ignore: ['**/node_modules/**'],
             });
 
-            const packages = releases.map(({ name, version }) => {
+            for (const pkg of packages) {
               const pkgFile = path.join(packageRoot, pkg);
               const content = JSON.parse(await readFile(pkgFile, 'utf8'));
-              packageMap.set(content.name, `./packages/${pkg.replace('/package.json', '')}`);
-            });
+              const rel = `./packages/${pkg.replace(/\/package\.json$/, '')}`;
+              packageMap.set(content.name, rel);
+            }
           }
 
           await generatePackageMap();
 
           return JSON.stringify(Object.fromEntries(packageMap));
-    
+
     - name: Generate Message
       id: message
       uses: actions/github-script@v7
@@ -113,6 +100,11 @@ runs:
           const parsedPackageMap = JSON.parse(process.env.PACKAGE_MAP);
           const packageMap = new Map(Object.entries(parsedPackageMap));
           const role = process.env.ROLE_MENTION_ID;
+
+          if (!Array.isArray(releases) || releases.length === 0) {
+            core.setFailed('No releases provided to Release Bot.');
+            return;
+          }
 
           const emojis = ['🎉', '🥳', '🚀', '🧑', '🎊', '🏆', '✅', '🤩', '🤖', '🙌'];
           const descriptors = [
@@ -241,7 +233,7 @@ runs:
 
           message += `\n\nAlso ${item(extraVerbs)}: ${remainingPackages.length} other packages!`;
           return message;
-    
+
     - name: Send message on Discord
       env:
         DISCORD_WEBHOOK: ${{ inputs.DISCORD_WEBHOOK }}
