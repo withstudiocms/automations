@@ -27,11 +27,22 @@ on:
         description: >
           A JSON array of packages that were published in this release.
           Each package should have a `name` and `version` field.
+      RoleMentionId:
+        type: string
+        required: false
+        description: >
+          Optional Discord role ID to mention at the top of the message.
 jobs:
   release-bot:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+      - name: Checkout Automations Repository
         uses: actions/checkout@v4
         with:
           repository: "withstudiocms/automations"
@@ -39,7 +50,7 @@ jobs:
           path: "automation"
           persist-credentials: false
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
       - name: Setup Node.js based on .node-version
         uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4
         with:
@@ -47,7 +58,6 @@ jobs:
           cache: 'pnpm'
       - name: Install Extra Dependencies
         run: pnpm add -Dw tinyglobby --no-save
-        working-directory: ${{ inputs.CWD }}
       - name: Generate BaseURL
         id: base-url
         uses: actions/github-script@v7
@@ -84,14 +94,11 @@ jobs:
                 ignore: ['**/node_modules/**'],
               });
 
-              await Promise.all(
-                packages.map(async (pkg) => {
-                  const pkgFile = path.join(packageRoot, pkg);
-                  const content = JSON.parse(await readFile(pkgFile, 'utf8'));
-                  packageMap.set(content.name, `./packages/${pkg.replace('/package.json', '')}`);
-                })
-              );
-            }
+            const packages = releases.map(({ name, version }) => {
+              const pkgFile = path.join(packageRoot, pkg);
+              const content = JSON.parse(await readFile(pkgFile, 'utf8'));
+              packageMap.set(content.name, `./packages/${pkg.replace('/package.json', '')}`);
+            });
 
             await generatePackageMap();
 
@@ -103,12 +110,12 @@ jobs:
           RELEASES: ${{ inputs.PublishedPackages }}
           PACKAGE_MAP: ${{ steps.package-map.outputs.result }}
           BASE_URL: ${{ steps.base-url.outputs.result }}
+          ROLE_MENTION_ID: ${{ inputs.RoleMentionId }}
         with:
           result-encoding: string
           script: |
             const baseUrl = new URL(process.env.BASE_URL);
             const releases = JSON.parse(process.env.RELEASES || '[]');
-            
             const parsedPackageMap = JSON.parse(process.env.PACKAGE_MAP);
             const packageMap = new Map(Object.entries(parsedPackageMap));
 
@@ -204,7 +211,8 @@ jobs:
             const descriptor = item(descriptors);
             const verb = item(verbs);
 
-            let message = '<@&1309310416362537020>\n';
+            const role = process.env.ROLE_MENTION_ID;
+            let message = role ? `<@&${role}>\n` : '';
 
             if (packages.length === 1) {
               const { name, version, url } = packages[0];
@@ -228,7 +236,7 @@ jobs:
             message += `\nAlso ${item(extraVerbs)}:`;
 
             const remainingPackages = packages.filter((p) => p.name !== name);
-            for (const { name, version, _url } of remainingPackages) {
+            for (const { name, version } of remainingPackages) {
               message += `\n• \`${name}@${version}\``;
             }
 
