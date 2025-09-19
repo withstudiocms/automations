@@ -14,9 +14,6 @@ inputs:
   CWD:
     description: The current working directory where the release bot should operate.
     required: true
-  PublishedPackages:
-    description: A JSON array of packages that were published in this release.
-    required: true
   RoleMentionId:
     description: Optional Discord role ID to mention at the top of the message.
     required: false
