@@ -13,31 +13,6 @@ concurrency:
 permissions: {}
 
 jobs:
-  knip:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      checks: write
-      issues: write
-      pull-requests: write
-    env:
-      NODE_OPTIONS: "--max_old_space_size=4096"
-    name: Run Knip Linter and Report
-    if: github.event.pull_request.head.repo.full_name == github.repository
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          persist-credentials: false
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.STUDIOCMS_SERVICE_TOKEN }}
-
-      - name: Install Tools & Dependencies
-        uses: ./.github/actions/install
-
-      - name: Run Knip Linter and Report
-        uses: codex-/knip-reporter@398e656c485dd1649f06631a4cd2e602c6ccc4f1 # v2.6.0
-
   zizmor:
     name: Run Zizmor Actions Security Analysis
     runs-on: ubuntu-latest
