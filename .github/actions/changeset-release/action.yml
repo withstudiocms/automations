@@ -62,7 +62,7 @@ runs:
 
     - name: Initiate Release Bot
       if: ${{ steps.changesets.outputs.published == 'true' }}
-      uses: ./.github/actions/releasebot/action.yml
+      uses: ./.github/actions/releasebot
       with:
         repository: ${{ inputs.repository }}
         CWD: ${{ inputs.CWD }}

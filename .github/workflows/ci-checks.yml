@@ -33,7 +33,7 @@ jobs:
           token: ${{ secrets.STUDIOCMS_SERVICE_TOKEN }}
 
       - name: Install Tools & Dependencies
-        uses: ./.github/actions/install/action.yml
+        uses: ./.github/actions/install
 
       - name: Run Knip Linter and Report
         uses: codex-/knip-reporter@398e656c485dd1649f06631a4cd2e602c6ccc4f1 # v2.6.0
