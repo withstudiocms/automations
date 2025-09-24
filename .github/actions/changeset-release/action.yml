@@ -31,11 +31,22 @@ inputs:
     description: >
       An npm token with publish permissions.
       You can use the `NPM_TOKEN` secret for this.
-    required: true
+    required: false # Switched to NPM's new OIDC
+  USE_GITHUB_BOT:
+    description: Whether to use the new GitHub Apollo bot for commits and PRs.
+    required: false
+    default: "false"
 
 runs:
   using: composite
   steps:
+    - name: Setup git user
+      if: ${{ inputs.USE_GITHUB_BOT == 'true' }}
+      shell: bash
+      run: |
+        git config --global user.name "apollo-git-bot[bot]"
+        git config --global user.email "234251158+apollo-git-bot[bot]@users.noreply.github.com"
+
     - name: Run Changeset Release
       id: changesets
       uses: changesets/action@e0145edc7d9d8679003495b11f87bd8ef63c0cba # v1.5.3
