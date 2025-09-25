@@ -51,7 +51,8 @@ runs:
       id: changesets
       uses: changesets/action@e0145edc7d9d8679003495b11f87bd8ef63c0cba # v1.5.3
       with:
-        setupGitUser: true
+        # If USE_GITHUB_BOT is true we don't want Changesets to do anything user related
+        setupGitUser: ${{ inputs.USE_GITHUB_BOT != 'true' }}
         commit: "👷 [ci]: Version Packages"
         title: "👷 [ci]: Ready for Release"
         version: pnpm ci:version
