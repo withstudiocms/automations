@@ -14,7 +14,6 @@ on:
         type: 'string'
         description: 'The build command to run before running the release'
         required: true
-        default: 'pnpm ci:build'
 
 jobs:
   publish:

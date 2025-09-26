@@ -14,7 +14,6 @@ on:
         type: 'string'
         description: 'The build command to run before running the release'
         required: true
-        default: 'pnpm ci:build'
 
 jobs:
   publish:
@@ -49,7 +48,7 @@ jobs:
 
       - name: Publish packages
         env:
-          PACKAGES_PATHS: ${{ steps.get-packages.outputs.affected-packages }}
+          AFFECTED_PACKAGES: ${{ steps.get-packages.outputs.affected-packages }}
         run: |
           packages=$(echo "$AFFECTED_PACKAGES" | jq -r '.[]' 2>/dev/null | tr '\n' ' ' || echo "")
           if [ -n "$packages" ]; then

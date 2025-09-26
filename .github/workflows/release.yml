@@ -17,7 +17,6 @@ on:
         type: 'string'
         description: 'The build command to run before running the release'
         required: true
-        default: 'pnpm ci:build'
       RoleMentionId:
         type: 'string'
         description: 'The Discord Role ID to mention in the release notification (optional)'

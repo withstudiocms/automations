@@ -13,7 +13,7 @@ runs:
       id: pnpm-packages
       shell: bash
       run: |
-        echo "packages-output=$(pnpm list --recursive --depth -1 --json | jq -c 'map(select(.private == false))')" >> $GITHUB_OUTPUT
+        echo "packages-output=$(pnpm list --recursive --depth -1 --json | jq -c 'map(select(.private != true))')" >> $GITHUB_OUTPUT
 
     - name: Compute packages paths
       id: compute-packages-paths

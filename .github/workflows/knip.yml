@@ -14,7 +14,6 @@ on:
         type: 'string'
         description: 'The build command to run before running knip'
         required: true
-        default: 'pnpm ci:build'
 
 jobs:
   publish:
