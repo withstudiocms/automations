@@ -34,7 +34,7 @@ jobs:
           token: ${{ steps.bot-token.outputs.token }}
 
       - name: Install Tools & Dependencies
-        uses: withstudiocms/automations/.github/actions/install@89b4e8b178b4f8b3e78a1b8d935ab47a31393888 # main
+        uses: ./.github/actions/install
 
       - name: Run Biome formatter
         run: pnpm biome check --write .
