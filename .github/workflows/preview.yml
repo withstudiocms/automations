@@ -19,6 +19,11 @@ jobs:
   publish:
     if: github.repository_owner == 'withstudiocms'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      issues: write
+      pull-requests: write
     steps:
       - name: Setup Apollo Git Bot
         id: bot-token
