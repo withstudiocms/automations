@@ -1,4 +1,4 @@
-name: Pkg PR New - Preview Release
+name: Pkg PR New - Preview PR Release
 
 on:
   workflow_call:
