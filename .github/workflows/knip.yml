@@ -1,0 +1,45 @@
+name: Run Knip Linter and Report
+
+on:
+  workflow_call:
+    secrets:
+      STUDIOCMS_GIT_BOT_APP_ID:
+        description: 'The GitHub App ID for authenticating with the GitHub API'
+        required: true
+      STUDIOCMS_GIT_BOT_PRIVATE_KEY:
+        description: 'The GitHub App Private Key for authenticating with the GitHub API'
+        required: true
+    inputs:
+      pre-knip-cmd:
+        type: 'string'
+        description: 'The build command to run before running knip'
+        required: true
+        default: 'pnpm ci:build'
+
+jobs:
+  publish:
+    if: github.repository_owner == 'withstudiocms'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Apollo Git Bot
+        id: bot-token
+        uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
+        with:
+          app-id: ${{ secrets.STUDIOCMS_GIT_BOT_APP_ID }}
+          private-key: ${{ secrets.STUDIOCMS_GIT_BOT_PRIVATE_KEY }}
+
+      - name: Checkout Repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+          ref: ${{ github.head_ref }}
+          token: ${{ steps.bot-token.outputs.token }}
+
+      - name: Install Tools & Dependencies
+        uses: ./.github/actions/install
+
+      - name: Run Pre-Knip Command
+        run: ${{ inputs.pre-knip-cmd }}
+
+      - name: Run Knip Linter and Report
+        uses: codex-/knip-reporter@398e656c485dd1649f06631a4cd2e602c6ccc4f1 # v2.6.0
