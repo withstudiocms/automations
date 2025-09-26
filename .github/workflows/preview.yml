@@ -1,0 +1,63 @@
+name: Pkg PR New - Preview Release
+
+on:
+  workflow_call:
+    secrets:
+      STUDIOCMS_GIT_BOT_APP_ID:
+        description: 'The GitHub App ID for authenticating with the GitHub API'
+        required: true
+      STUDIOCMS_GIT_BOT_PRIVATE_KEY:
+        description: 'The GitHub App Private Key for authenticating with the GitHub API'
+        required: true
+    inputs:
+      build-cmd:
+        type: 'string'
+        description: 'The build command to run before running the release'
+        required: true
+
+jobs:
+  publish:
+    if: github.repository_owner == 'withstudiocms'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Setup Apollo Git Bot
+        id: bot-token
+        uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
+        with:
+          app-id: ${{ secrets.STUDIOCMS_GIT_BOT_APP_ID }}
+          private-key: ${{ secrets.STUDIOCMS_GIT_BOT_PRIVATE_KEY }}
+
+      - name: Disable git crlf
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+          # Changeset needs access to the main branch to find pending changesets
+          fetch-depth: 0
+
+      - name: Install Tools & Dependencies
+        uses: ./.github/actions/install
+
+      - name: Run Build
+        run: ${{ inputs.build-cmd }}
+
+      - name: Get Packages
+        id: get-packages
+        uses: ./.github/actions/pnpm-package-paths
+
+      - name: Publish packages
+        env:
+          PACKAGES_PATHS: ${{ steps.get-packages.outputs.packages-paths }}
+        run: |
+          packages=$(echo "$PACKAGES_PATHS" | jq -r '.[]' 2>/dev/null | tr '\n' ' ' || echo "")
+          if [ -n "$packages" ]; then
+            pnpm dlx pkg-pr-new publish --pnpm --no-template $packages
+          else
+            echo "No affected packages to publish"
+          fi

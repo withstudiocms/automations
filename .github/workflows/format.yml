@@ -1,0 +1,49 @@
+name: Biome Formatter
+
+on:
+  workflow_call:
+    secrets:
+      STUDIOCMS_GIT_BOT_APP_ID:
+        description: 'The GitHub App ID for authenticating with the GitHub API'
+        required: true
+      STUDIOCMS_GIT_BOT_PRIVATE_KEY:
+        description: 'The GitHub App Private Key for authenticating with the GitHub API'
+        required: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      NODE_OPTIONS: "--max_old_space_size=4096"
+    steps:
+      - name: Setup Apollo Git Bot
+        id: bot-token
+        uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
+        with:
+          app-id: ${{ secrets.STUDIOCMS_GIT_BOT_APP_ID }}
+          private-key: ${{ secrets.STUDIOCMS_GIT_BOT_PRIVATE_KEY }}
+
+      - name: Checkout Repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: true
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          token: ${{ steps.bot-token.outputs.token }}
+
+      - name: Install Tools & Dependencies
+        uses: withstudiocms/automations/.github/actions/install@89b4e8b178b4f8b3e78a1b8d935ab47a31393888 # main
+
+      - name: Run Biome formatter
+        run: pnpm biome check --write .
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@778341af668090896ca464160c2def5d1d1a3eb0 # v6.0.1
+        with:
+          commit_message: '[ci] lint'
+          branch: ${{ github.event.pull_request.head.sha || github.sha }}
+          commit_user_name: apollo-git-bot[bot]
+          commit_user_email: 234251158+apollo-git-bot[bot]@users.noreply.github.com
+          commit_author: Apollo Git Bot <234251158+apollo-git-bot[bot]@users.noreply.github.com>

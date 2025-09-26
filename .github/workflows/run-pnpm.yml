@@ -1,0 +1,30 @@
+name: Run PNPM Command
+
+on:
+  workflow_call:
+    inputs:
+      commands:
+        type: 'string'
+        description: |
+          A JSON array of package.json scripts, e.g.
+          '["lint","test","types"]'
+        required: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        command: ${{ fromJson(inputs.commands) }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Install Tools & Dependencies
+        uses: ./.github/actions/install
+
+      - name: Run ${{ matrix.command }}
+        run: pnpm run "${{env.COMMAND}}"
+        env:
+          COMMAND: ${{ matrix.command }}
