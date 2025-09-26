@@ -1,3 +1,6 @@
+## TODO: Deprecate this action in favor of using the
+## new workflow call directly in .github/workflows/release.yml
+
 name: Changeset Release
 author: withstudiocms
 description: >

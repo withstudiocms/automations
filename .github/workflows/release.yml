@@ -42,7 +42,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Tools & Dependencies
-        uses: withstudiocms/automations/.github/actions/install@89b4e8b178b4f8b3e78a1b8d935ab47a31393888 # main
+        uses: ./.github/actions/install
 
       - name: Run Build
         run: ${{ inputs.build-cmd }}
@@ -68,7 +68,17 @@ jobs:
     
       - name: Add Label to CI PR
         if: ${{ steps.changesets.outputs.hasChangesets == 'true' }}
-        run: gh pr edit "$PR_URL" --add-label "ci"
+        run: |
+          if [ -n "$PR_URL" ]; then
+            echo "Adding 'ci' label to PR: $PR_URL"
+            if gh pr edit "$PR_URL" --add-label "ci"; then
+              echo "Successfully added label to PR"
+            else
+              echo "Failed to add label to PR, but continuing workflow"
+            fi
+          else
+            echo "No PR URL available, skipping label addition"
+          fi
         shell: bash
         env:
           PR_URL: ${{ steps.changesets.outputs.pull_request_url }}
