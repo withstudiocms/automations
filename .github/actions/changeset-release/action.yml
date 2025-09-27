@@ -74,7 +74,7 @@ runs:
 
     - name: Initiate Release Bot
       if: ${{ steps.changesets.outputs.published == 'true' }}
-      uses: ./.github/actions/releasebot
+      uses: withstudiocms/automations/.github/actions/releasebot@main
       with:
         repository: ${{ inputs.repository }}
         CWD: ${{ inputs.CWD }}
