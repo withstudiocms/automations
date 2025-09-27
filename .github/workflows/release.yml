@@ -45,7 +45,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Tools & Dependencies
-        uses: ./.github/actions/install
+        uses: withstudiocms/automations/.github/actions/install@main
 
       - name: Run Build
         run: ${{ inputs.build-cmd }}
@@ -89,7 +89,7 @@ jobs:
 
       - name: Initiate Release Bot
         if: ${{ steps.changesets.outputs.published == 'true' }}
-        uses: ./.github/actions/releasebot
+        uses: withstudiocms/automations/.github/actions/releasebot@main
         with:
           repository: ${{ github.repository }}
           CWD: ${{ github.workspace }}

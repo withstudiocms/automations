@@ -2,5 +2,17 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>withstudiocms/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "withstudiocms/automations/**"
+      ],
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "withstudiocms/automations GitHub Actions",
+      "enabled": false
+    }
   ]
 }
