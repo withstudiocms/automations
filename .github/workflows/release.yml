@@ -4,22 +4,32 @@ on:
   workflow_call:
     secrets:
       STUDIOCMS_GIT_BOT_APP_ID:
-        description: 'The GitHub App ID for authenticating with the GitHub API'
+        description: "The GitHub App ID for authenticating with the GitHub API"
         required: true
       STUDIOCMS_GIT_BOT_PRIVATE_KEY:
-        description: 'The GitHub App Private Key for authenticating with the GitHub API'
+        description: "The GitHub App Private Key for authenticating with the GitHub API"
         required: true
       DISCORD_WEBHOOK_RELEASE:
-        description: 'The Discord Webhook URL for posting release notifications'
+        description: "The Discord Webhook URL for posting release notifications"
         required: false
     inputs:
       build-cmd:
-        type: 'string'
-        description: 'The build command to run before running the release'
+        type: "string"
+        description: "The build command to run before running the release"
         required: true
+      changeset-version:
+        type: "string"
+        description: "The changeset version command to run"
+        required: false
+        default: "pnpm changeset version"
+      changeset-publish:
+        type: "string"
+        description: "The changeset publish command to run"
+        required: false
+        default: "pnpm changeset publish"
       RoleMentionId:
-        type: 'string'
-        description: 'The Discord Role ID to mention in the release notification (optional)'
+        type: "string"
+        description: "The Discord Role ID to mention in the release notification (optional)"
         required: false
 
 jobs:
@@ -38,7 +48,7 @@ jobs:
         with:
           app-id: ${{ secrets.STUDIOCMS_GIT_BOT_APP_ID }}
           private-key: ${{ secrets.STUDIOCMS_GIT_BOT_PRIVATE_KEY }}
-          
+
       - name: Checkout Repo
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -49,7 +59,7 @@ jobs:
 
       - name: Run Build
         run: ${{ inputs.build-cmd }}
-          
+
       - name: Setup git user
         shell: bash
         run: |
@@ -64,11 +74,11 @@ jobs:
           setupGitUser: false
           commit: "👷 [ci]: Version Packages"
           title: "👷 [ci]: Ready for Release"
-          version: pnpm changeset version
-          publish: pnpm changeset publish
+          version: ${{ inputs.changeset-version }}
+          publish: ${{ inputs.changeset-publish }}
         env:
           GITHUB_TOKEN: ${{ steps.bot-token.outputs.token }}
-    
+
       - name: Add Label to CI PR
         if: ${{ steps.changesets.outputs.hasChangesets == 'true' }}
         run: |
