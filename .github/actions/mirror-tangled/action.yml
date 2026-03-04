@@ -1,0 +1,61 @@
+name: Mirror to Tangled.org
+description: >
+  A GitHub Action to mirror the repository to Tangled.org.
+
+  This Action is based on the gwennlbh/to-tangled GitHub Action but has been modified to suit our specific organization and workflow needs.
+
+branding:
+  icon: activity
+  color: white
+
+inputs:
+  repo:
+    description: The repository to mirror to Tangled.org (e.g., "owner/repo").
+    required: true
+  knot:
+    description: The Tangled.org knot to mirror to (e.g., "tangled.org" by default).
+    required: false
+    default: tangled.org
+  ssh-key:
+    description: Private SSH key for authenticating with Tangled.org. This should be added as a secret in the repository.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout Repo
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.sha }}
+        persist-credentials: false
+
+    - name: Run Sync Task
+      shell: bash
+      env:
+        TANGLED_SSH_KEY: ${{ inputs.ssh-key }}
+      run: |
+        set -euo pipefail
+
+        # Turn off strict SSH key checking
+        mkdir -p ~/.ssh
+        echo "Host *
+          StrictHostKeyChecking no
+          UserKnownHostsFile=/dev/null" > ~/.ssh/config
+
+        # Write SSH key to disk
+        echo "$TANGLED_SSH_KEY" > ~/.ssh/tangled_key
+        chmod 600 ~/.ssh/tangled_key
+
+        # Configure SSH to use the key for tangled.org
+        echo "Host tangled.org
+          IdentityFile ~/.ssh/tangled_key" >> ~/.ssh/config
+
+        # Set permissions on SSH config
+        chmod 600 ~/.ssh/config
+
+        # Setup git remote for Tangled.org
+        git remote add tangled git@${{ inputs.knot }}:${{ inputs.repo }}
+
+        # Push in Mirror mode to Tangled.org
+        git push --mirror tangled
