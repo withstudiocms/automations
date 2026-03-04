@@ -11,6 +11,7 @@
         "ljharb",
         "Mergebot",
         "mscharley",
+        "pipefail",
         "releasebot",
         "stefanzweifel",
         "studiocms",
