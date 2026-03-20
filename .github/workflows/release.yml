@@ -111,4 +111,4 @@ jobs:
           PublishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}
           RoleMentionId: ${{ inputs.RoleMentionId }}
-          is-workspace: ${{ inputs.is-workspace }}
+          is-workspace: "${{ inputs.is-workspace }}"
