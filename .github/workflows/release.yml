@@ -31,6 +31,11 @@ on:
         type: "string"
         description: "The Discord Role ID to mention in the release notification (optional)"
         required: false
+      is-workspace:
+        type: "boolean"
+        description: "Whether the repository is a monorepo workspace (e.g., using pnpm workspaces)"
+        required: false
+        default: true
 
 jobs:
   run:
@@ -106,3 +111,4 @@ jobs:
           PublishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}
           RoleMentionId: ${{ inputs.RoleMentionId }}
+          is-workspace: ${{ inputs.is-workspace }}

@@ -25,6 +25,10 @@ inputs:
       URL of a Discord webhook for release notifications.
       To create one, follow the same steps as for the mergebot webhook.
     required: true
+  is-workspace:
+    description: Whether the repository is a monorepo workspace (e.g., using pnpm workspaces).
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -33,7 +37,7 @@ runs:
     # so we don't need to set it up again.
     - name: Install Extra Dependencies
       shell: bash
-      run: pnpm add -D -w tinyglobby
+      run: pnpm add -D ${{ inputs.is-workspace == 'true' && '-w' || '' }} tinyglobby
 
     - name: Generate BaseURL
       id: base-url
