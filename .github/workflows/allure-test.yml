@@ -1,0 +1,131 @@
+name: Allure Test
+
+on:
+  workflow_call:
+    secrets:
+      STUDIOCMS_GIT_BOT_APP_ID:
+        description: "The GitHub App ID for authenticating with the GitHub API"
+        required: true
+      STUDIOCMS_GIT_BOT_PRIVATE_KEY:
+        description: "The GitHub App Private Key for authenticating with the GitHub API"
+        required: true
+    inputs:
+      mode:
+        description: >
+          The mode to run the workflow in. Can either be "pr" or "push". In "pr" mode, the workflow will run on pull request events and post a comment with the Allure report link. In "push" mode, the workflow will run on push events and upload the Allure report as an artifact.
+        type: string
+        required: true
+        default: "push"
+      trackHistory:
+        description: >
+          Whether to track test history and include it in the Allure report. If set to true, the workflow will attempt to pull the history from the specified history branch and include it in the report generation. This allows Allure to show trends and historical data in the report.
+        type: boolean
+        required: false
+        default: false
+      historyBranch:
+        description: >
+          The branch to use for storing test history. This is only used in "pr" mode. The workflow will checkout this branch, update the Allure history, and push it back to the repository. Make sure this branch exists before running the workflow.
+        type: string
+        required: false
+        default: "allure/test-history"
+      historyPath:
+        description: >
+          The path to the Allure history directory.
+        type: string
+        required: false
+        default: "test-history"
+      allurePagesBranch:
+        description: >
+          The branch to deploy the Allure report to when running in "push" mode. The workflow will push the generated report to this branch, which can then be served using GitHub Pages. Make sure this branch exists before running the workflow.
+        type: string
+        required: false
+        default: "allure/test-report"
+      allureReportPath:
+        description: >
+          The path to the generated Allure report.
+        type: string
+        required: false
+        default: "./allure-report"
+      needsBuild:
+        description: >
+          Whether the workflow needs to wait for a build job to complete before running. This is useful if the Allure report is generated in a separate build job and needs to be available before this workflow can run.
+        type: boolean
+        required: false
+        default: false
+      buildCmd:
+        description: >
+          The command to run the build job. This is only used if needsBuild is set to true. The workflow will run this command and wait for it to complete before running the tests and generating the Allure report.
+        type: string
+        required: false
+        default: "pnpm ci:build"
+      testCmd:
+        description: >
+          The command to run the tests and generate the Allure report. This should be a command that runs the tests and generates the Allure report in the expected location (e.g., "pnpm ci:test" if the report is generated in the default location).
+        type: string
+        required: false
+        default: "pnpm ci:test"
+
+permissions: {}
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Setup Apollo Git Bot
+        id: bot-token
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+        with:
+          app-id: ${{ secrets.STUDIOCMS_GIT_BOT_APP_ID }}
+          private-key: ${{ secrets.STUDIOCMS_GIT_BOT_PRIVATE_KEY }}
+
+      - name: Checkout Repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+          token: ${{ steps.bot-token.outputs.token }}
+
+      - name: Checkout History branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        if: ${{ inputs.trackHistory }}
+        with:
+          ref: ${{ inputs.historyBranch }}
+          path: ${{ inputs.historyPath }}
+          persist-credentials: false
+          token: ${{ steps.bot-token.outputs.token }}
+
+      - name: Install Tools & Dependencies
+        uses: withstudiocms/automations/.github/actions/install@main
+
+      - name: Build packages
+        if: ${{ inputs.needsBuild }}
+        run: ${{ inputs.buildCmd }}
+
+      - name: Run tests and generate report
+        run: ${{ inputs.testCmd }}
+
+      - name: Run Allure Action
+        uses: allure-framework/allure-action@c24234151c027cfee99e00eb6ec2dac1eb350414 # v0.6.6
+        if: ${{ inputs.mode == 'pr' }}
+        with:
+          report-directory: ${{ inputs.allureReportPath }}
+          github-token: ${{ steps.bot-token.outputs.token }}
+
+      - name: Deploy Allure Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+        if: ${{ inputs.mode == 'push' }}
+        with:
+          github_token: ${{ steps.bot-token.outputs.token }}
+          publish_branch: ${{ inputs.allurePagesBranch }}
+          publish_dir: ${{ inputs.allureReportPath }}
+
+      - name: Upload History file (If tracking history and in push mode)
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+        if: ${{ inputs.trackHistory && inputs.mode == 'push' }}
+        with:
+          github_token: ${{ steps.bot-token.outputs.token }}
+          publish_branch: ${{ inputs.historyBranch }}
+          publish_dir: ${{ inputs.historyPath }}
