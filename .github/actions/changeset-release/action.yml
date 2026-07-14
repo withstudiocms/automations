@@ -52,7 +52,7 @@ runs:
 
     - name: Run Changeset Release
       id: changesets
-      uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1.7.0
+      uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
       with:
         # If USE_GITHUB_BOT is true we don't want Changesets to do anything user related
         setupGitUser: ${{ inputs.USE_GITHUB_BOT != 'true' }}
@@ -74,7 +74,7 @@ runs:
 
     - name: Initiate Release Bot
       if: ${{ steps.changesets.outputs.published == 'true' }}
-      uses: withstudiocms/automations/.github/actions/releasebot@main
+      uses: withstudiocms/automations/.github/actions/releasebot@2f4fab1a66855feadec9e960bdbdc4368c23aa18 # main
       with:
         repository: ${{ inputs.repository }}
         CWD: ${{ inputs.CWD }}
