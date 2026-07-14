@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Install Tools & Dependencies
-        uses: withstudiocms/automations/.github/actions/install@main
+        uses: withstudiocms/automations/.github/actions/install@2f4fab1a66855feadec9e960bdbdc4368c23aa18 # main
 
       - name: Run ${{ matrix.command }}
         run: pnpm run "${{env.COMMAND}}"

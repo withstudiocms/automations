@@ -77,7 +77,7 @@ jobs:
     steps:
       - name: Setup Apollo Git Bot
         id: bot-token
-        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           app-id: ${{ secrets.STUDIOCMS_GIT_BOT_APP_ID }}
           private-key: ${{ secrets.STUDIOCMS_GIT_BOT_PRIVATE_KEY }}
@@ -98,7 +98,7 @@ jobs:
           token: ${{ steps.bot-token.outputs.token }}
 
       - name: Install Tools & Dependencies
-        uses: withstudiocms/automations/.github/actions/install@main
+        uses: withstudiocms/automations/.github/actions/install@2f4fab1a66855feadec9e960bdbdc4368c23aa18 # main
 
       - name: Build packages
         if: ${{ inputs.needsBuild }}
@@ -108,14 +108,14 @@ jobs:
         run: ${{ inputs.testCmd }}
 
       - name: Run Allure Action
-        uses: allure-framework/allure-action@c24234151c027cfee99e00eb6ec2dac1eb350414 # v0.6.6
+        uses: allure-framework/allure-action@bd0373251ed3f1c5ac9aa44ac86ed40d839b3094 # v0.8.0
         if: ${{ inputs.mode == 'pr' }}
         with:
           report-directory: ${{ inputs.allureReportPath }}
           github-token: ${{ steps.bot-token.outputs.token }}
 
       - name: Deploy Allure Report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         if: ${{ inputs.mode == 'push' }}
         with:
           github_token: ${{ steps.bot-token.outputs.token }}
@@ -123,7 +123,7 @@ jobs:
           publish_dir: ${{ inputs.allureReportPath }}
 
       - name: Upload History file (If tracking history and in push mode)
-        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         if: ${{ inputs.trackHistory && inputs.mode == 'push' }}
         with:
           github_token: ${{ steps.bot-token.outputs.token }}
