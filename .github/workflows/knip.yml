@@ -33,7 +33,7 @@ jobs:
           private-key: ${{ secrets.STUDIOCMS_GIT_BOT_PRIVATE_KEY }}
 
       - name: Checkout Repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -46,4 +46,4 @@ jobs:
         run: ${{ inputs.pre-knip-cmd }}
 
       - name: Run Knip Linter and Report
-        uses: codex-/knip-reporter@398e656c485dd1649f06631a4cd2e602c6ccc4f1 # v2.6.0
+        uses: codex-/knip-reporter@438819707021437618b2527e668b0d1e491db05e # v3.0.0
