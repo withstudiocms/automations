@@ -35,21 +35,21 @@ jobs:
       - name: Disable git crlf
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           # Changeset needs access to the main branch to find pending changesets
           fetch-depth: 0
 
       - name: Install Tools & Dependencies
-        uses: withstudiocms/automations/.github/actions/install@3791122a36b77f6bb8392c1e46f6667a1c4e3f0f # main
+        uses: withstudiocms/automations/.github/actions/install@f32588d80ce35d57905264f7fa473b0f6e297c0a # main
 
       - name: Run Build
         run: ${{ inputs.build-cmd }}
 
       - name: Get Packages
         id: get-packages
-        uses: withstudiocms/automations/.github/actions/pnpm-package-paths@3791122a36b77f6bb8392c1e46f6667a1c4e3f0f # main
+        uses: withstudiocms/automations/.github/actions/pnpm-package-paths@f32588d80ce35d57905264f7fa473b0f6e297c0a # main
 
       - name: Publish packages
         env:
