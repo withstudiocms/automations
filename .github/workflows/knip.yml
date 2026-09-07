@@ -46,4 +46,4 @@ jobs:
         run: ${{ inputs.pre-knip-cmd }}
 
       - name: Run Knip Linter and Report
-        uses: codex-/knip-reporter@438819707021437618b2527e668b0d1e491db05e # v3.0.0
+        uses: codex-/knip-reporter@7ee82434e4adcb560038aaa59bc647fe8c3c6ee4 # v4.0.0
