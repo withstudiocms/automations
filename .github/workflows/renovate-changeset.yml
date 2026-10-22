@@ -19,19 +19,19 @@ jobs:
     steps:
       - name: Setup Apollo Git Bot
         id: bot-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
           app-id: ${{ secrets.STUDIOCMS_GIT_BOT_APP_ID }}
           private-key: ${{ secrets.STUDIOCMS_GIT_BOT_PRIVATE_KEY }}
 
       - name: Checkout Repo
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           token: ${{ steps.bot-token.outputs.token }}
 
       - name: Update PR
-        uses: mscharley/dependency-changesets-action@f96232368519695969bea8a8cfff7cca32b1e56a # v1.2.4
+        uses: mscharley/dependency-changesets-action@874dac2372a085cb94f750e8bdf5b1173a838a75 # v1.2.5
         with:
           token: ${{ steps.bot-token.outputs.token }}
           use-conventional-commits: true
